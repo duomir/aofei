@@ -1,0 +1,69 @@
+##########################################/usr/local/nagios/etc/nagios.cfg##################################################
+#
+# Bulk / NPCD mode
+
+#
+
+service_perfdata_file=/usr/local/pnp4nagios/var/service-perfdata
+service_perfdata_file_template=DATATYPE::SERVICEPERFDATA\tTIMET::$TIMET$\tHOSTNAME::$HOSTNAME$\tSERVICEDESC::$SERVICEDESC$\tSERVICEPERFDATA::$SERVICEPERFDATA$\tSERVICECHECKCOMMAND::$SERVICECHECKCOMMAND$\tHOSTSTATE::$HOSTSTATE$\tHOSTSTATETYPE::$HOSTSTATETYPE$\tSERVICESTATE::$SERVICESTATE$\tSERVICESTATETYPE::$SERVICESTATETYPE$
+service_perfdata_file_mode=a
+service_perfdata_file_processing_interval=15
+service_perfdata_file_processing_command=process-service-perfdata-file
+        
+# *** the template definition differs from the one in the original nagios.cfg
+# #            
+host_perfdata_file=/usr/local/pnp4nagios/var/host-perfdata
+host_perfdata_file_template=DATATYPE::HOSTPERFDATA\tTIMET::$TIMET$\tHOSTNAME::$HOSTNAME$\tHOSTPERFDATA::$HOSTPERFDATA$\tHOSTCHECKCOMMAND::$HOSTCHECKCOMMAND$\tHOSTSTATE::$HOSTSTATE$\tHOSTSTATETYPE::$HOSTSTATETYPE$
+host_perfdata_file_mode=a
+host_perfdata_file_processing_interval=15
+host_perfdata_file_processing_command=process-host-perfdata-file
+
+##########################################/usr/local/nagios/etc/objects/commands.cfg################################################################################
+# Bulk with NPCD mode
+
+#
+
+define command {
+
+command_name process-service-perfdata-file
+
+command_line /bin/mv /usr/local/pnp4nagios/var/service-perfdata /usr/local/pnp4nagios/var/spool/service-perfdata.$TIMET$
+
+}
+
+define command {
+
+command_name process-host-perfdata-file
+
+command_line /bin/mv /usr/local/pnp4nagios/var/host-perfdata /usr/local/pnp4nagios/var/spool/host-perfdata.$TIMET$
+
+}
+
+############################################/usr/local/nagios/etc/objects/templates.cfg############################
+
+define host {
+
+name host-pnp
+
+action_url /pnp4nagios/index.php/graph?host=$HOSTNAME$&srv=_HOST_' class='tips' rel='/pnp4nagios/index.php/popup?host=$HOSTNAME$&srv=_HOST_
+
+register 0
+
+}
+
+define service {
+
+name srv-pnp
+
+action_url /pnp4nagios/index.php/graph?host=$HOSTNAME$&srv=$SERVICEDESC$' class='tips' rel='/pnp4nagios/index.php/popup?host=$HOSTNAME$&srv=$SERVICEDESC$
+
+register 0
+
+}
+
+######################################/usr/local/nagios/etc/nagios.cfg########################### 
+#Load Livestatus Module
+broker_module=/usr/lib/check_mk/livestatus.o /usr/local/nagios/var/rw/live
+event_broker_options=-1
+#added by setup.sh of check_mk
+#cfg_dir=/usr/local/nagios/etc/check_mk.d
