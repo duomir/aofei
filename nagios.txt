@@ -67,3 +67,16 @@ broker_module=/usr/lib/check_mk/livestatus.o /usr/local/nagios/var/rw/live
 event_broker_options=-1
 #added by setup.sh of check_mk
 #cfg_dir=/usr/local/nagios/etc/check_mk.d
+
+####################################command.cfg##################################################
+# The New notify-host-by-email - To add Traceroute.
+define command {
+        command_name  notify-host-by-email-diy
+        command_line  $USER1$/notify-pinger.sh "$NOTIFICATIONTYPE$" "$LONGDATETIME$" "$HOSTNAME$" "$CONTACTEMAIL$" "$HOSTADDRESS$" "$HOSTALIAS$" "$HOSTSTATE$" "$HOSTOUTPUT$"
+        }
+        
+# 'check_ping2' command definition
+define command {        
+        command_name    check_ping2        
+        command_line    $USER1$/check_ping -I  $ARG1$ -H $HOSTADDRESS$ -w $ARG2$ -c $ARG3$ -p 15 -t 30  
+        }  
